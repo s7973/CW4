@@ -18,4 +18,12 @@ namespace WebApplication1.Models
 
         public int IdEnrollment { get; set; }
     }
+
+    public class Student2
+    {
+
+        public String Semester { get; set; }
+
+        
+    }
 }
