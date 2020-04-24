@@ -17,6 +17,10 @@ namespace WebApplication1.Models
         public DateTime BirthDate { get; set; }
 
         public int IdEnrollment { get; set; }
+
+        public String Index { get; set; }
+        public String id { get; set; }
+
     }
 
     public class Student2
@@ -26,6 +30,7 @@ namespace WebApplication1.Models
 
         
     }
-
+    
+    
 
 }

@@ -32,7 +32,7 @@ namespace WebApplication1.Controllers
                 com2.Connection = con;
                 com3.Connection = con;
                 con.Open();
-                var tran = con.BeginTransaction();
+                //var tran = con.BeginTransaction();
 
                 try
                 {
@@ -43,7 +43,7 @@ namespace WebApplication1.Controllers
 
                     if (!dr.Read())
                     {
-                         tran.Rollback();
+                        // tran.Rollback();
                         return BadRequest(400);
                     }
 
@@ -54,7 +54,7 @@ namespace WebApplication1.Controllers
                     var dd = com2.ExecuteReader();
                     if (dd.Read())
                     {
-                        tran.Rollback();
+                        //tran.Rollback();
                         return BadRequest(401);
                     }
 
@@ -71,12 +71,12 @@ namespace WebApplication1.Controllers
                     com.ExecuteNonQuery();
 
 
-                     tran.Commit();
+                    // tran.Commit();
 
                 }
                 catch (SqlException e)
                 {
-                      tran.Rollback();
+                    //  tran.Rollback();
                 }
 
             }

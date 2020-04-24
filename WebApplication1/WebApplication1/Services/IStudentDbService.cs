@@ -4,13 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models;
 
-namespace WebApplication1.DAL
+namespace WebApplication1.Services
 {
     public interface IStudentDbService
     {
-        IEnumerable<Student> GetStudents();
-        IEnumerable<Student2> GetStudentById(String id);
-
+        Student GetStudent(String index);
 
     }
 }
