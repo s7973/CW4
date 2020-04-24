@@ -13,6 +13,7 @@ namespace WebApplication1.Controllers
     [Route("api/students")]
     public class BooksController : ControllerBase
     {
+        
         private String SqlConn = "Data Source=db-mssql; Initial Catalog=s7973; Integrated Security=True";
         private readonly IStudentDbService _studentDbService;
 
@@ -34,5 +35,8 @@ namespace WebApplication1.Controllers
         {
             return Ok(_studentDbService.GetStudentById(id));
         }
+        
     }
+
+
 }
