@@ -42,26 +42,33 @@ namespace WebApplication1
             }
 
             app.UseHttpsRedirection();
-
+            
             app.UseMiddleware<LoggingMiddleware>();
+            
             app.Use(async (contex, next) =>
             {
                 if (!contex.Request.Headers.ContainsKey("Index"))
                 {
                     contex.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await contex.Response.WriteAsync("Nie podano indeksu w nag³ówku");
                     return;
                 }
                 String index = contex.Request.Headers["Index"].ToString();
                 var student = service.GetStudent(index);
-                if (student == null)
+                if (student.IndexNumber == null)
                 {
                     contex.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     await contex.Response.WriteAsync("Brak studenta w bazie");
                     return;
                 }
+                else
+                {
+                    await contex.Response.WriteAsync("Student znajduje siê w bazie");
+                }
 
                 await next();
             });
+            
 
             app.UseRouting();
 

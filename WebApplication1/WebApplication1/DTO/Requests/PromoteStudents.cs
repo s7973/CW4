@@ -9,7 +9,7 @@ namespace WebApplication1.DTO.Requests
     {
         public string Studies { get; set; }
 
-        public string Semester { get; set; }
+        public int Semester { get; set; }
 
     }
 }

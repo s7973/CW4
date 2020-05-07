@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using WebApplication1.DTO.Requests;
 using WebApplication1.DTO.Responses;
 using WebApplication1.Models;
@@ -11,31 +12,26 @@ using WebApplication1.Models;
 namespace WebApplication1.Controllers
 {
     [ApiController]
-    [Route("api/enrollments")]
+    
 
     public class EnrollmentsController : ControllerBase
     {
+        [Route("api/enrollments")]
 
         [HttpPost]
 
         public IActionResult EnrollStudent(EnrollStudentRequest request)
         {
-
-
-
-            using (var con = new SqlConnection("Data Source=db-mssql; Initial Catalog=s7973; Integrated Security=True"))
+            using (var con = new SqlConnection("Data Source=db-mssql; Initial Catalog=s7973; Integrated Security=True; MultipleActiveResultSets=True"))
             using (var com = new SqlCommand())
-            using (var com2 = new SqlCommand())
-            using (var com3 = new SqlCommand())
             {
                 com.Connection = con;
-                com2.Connection = con;
-                com3.Connection = con;
                 con.Open();
-                //var tran = con.BeginTransaction();
+                var tran = con.BeginTransaction();
+                com.Transaction = tran;
 
-                try
-                {
+                    try
+                    {
                     com.CommandText = "select IdStudy from studies where name = @name";
                     com.Parameters.AddWithValue("name", request.Studies);
 
@@ -43,84 +39,128 @@ namespace WebApplication1.Controllers
 
                     if (!dr.Read())
                     {
-                        // tran.Rollback();
+                        tran.Rollback();
                         return BadRequest(400);
                     }
-
                     con.Close();
                     con.Open();
-                    com2.CommandText = "select semester from enrollment e, studies s where e.idstudy = s.idstudy and s.idstudy = '1' and s.name = @name";
-                    com2.Parameters.AddWithValue("name", request.Studies);
-                    var dd = com2.ExecuteReader();
-                    if (dd.Read())
+                    com.CommandText = "select semester from enrollment e, studies s where e.idstudy = s.idstudy and e.semester = '1' and s.name = @names";
+                    com.Parameters.AddWithValue("names", request.Studies);
+                    var dd = com.ExecuteReader();
+
+                    if (!dd.HasRows)
                     {
-                        //tran.Rollback();
-                        return BadRequest(401);
-                    }
+                        con.Close();
+                        con.Open();
+                        com.CommandText = "insert into enrollment(IdEnrollment, Semester, IdStudy, StartDate) values(40, 1, (select idstudy from studies where name = @name), GETDATE())";
+                        com.ExecuteReader();
+                    };
 
                     con.Close();
                     con.Open();
-                    com3.CommandText = "Insert into student (firstname, lastname, birthdate, indexnumber) values ((@firstname = firstname), (@lastname = lastname), (@birthdate = birthdate), (@indexnumber = indexnumber)";
-                    com3.Parameters.AddWithValue("firstname", request.FirstName);
-                    com3.Parameters.AddWithValue("lastname", request.LastName);
-                    com3.Parameters.AddWithValue("indexnumber", request.IndexNumber);
-                    com3.Parameters.AddWithValue("birthdate", request.BirthDate);
+                    com.CommandText = "Select indexnumber from student where indexnumber = @indexnumber2";
+                    com.Parameters.AddWithValue("indexnumber2", request.IndexNumber);
+                    var ind = com.ExecuteReader();
+                    if (!ind.HasRows)
+                    {
+                        con.Close();
+                        con.Open();
+                        com.CommandText = "Insert into student (firstname, lastname, birthdate, indexnumber, idenrollment) values (@firstname, @lastname, @birthdate,  @indexnumber3, (select idenrollment from enrollment where startdate = (select max(startdate) from enrollment)))";
+                        com.Parameters.AddWithValue("firstname", request.FirstName);
+                        com.Parameters.AddWithValue("lastname", request.LastName);
+                        com.Parameters.AddWithValue("indexnumber3", request.IndexNumber);
+                        com.Parameters.AddWithValue("birthdate", request.BirthDate);
+                        com.ExecuteReader();
 
+                        var output = new Enrollment();
+                        con.Close();
+                        con.Open();
+                        com.CommandText = "select * from enrollment where StartDate = (select max(StartDate) from enrollment)";
 
+                        dr = com.ExecuteReader();
 
-                    com.ExecuteNonQuery();
-
-
-                    // tran.Commit();
-
+                        while (dr.Read())
+                        {
+                            output = new Enrollment
+                            {
+                                IdEnrollment = int.Parse(dr["IdEnrollment"].ToString()),
+                                Semester = int.Parse(dr["Semester"].ToString()),
+                                IdStudy = int.Parse(dr["IdStudy"].ToString()),
+                                StartDate = DateTime.Parse(dr["StartDate"].ToString())
+                            }; ;
+                        }
+                        return StatusCode(201, output);
+                    }
+                    else if (ind.HasRows)
+                    {
+                        return BadRequest("Numer indeksu jest już w bazie");
+                    }
+                       tran.Commit();
+                     }
+                     catch (Exception e)
+                     {
+                          tran.Rollback();
+                          return BadRequest(e.Message);
+                     }
                 }
-                catch (SqlException e)
-                {
-                    //  tran.Rollback();
-                }
+            return Ok();
+            } 
 
-            }
-
-            return Ok(201);
-        }
-
+        
         [Route("api/enrollments/promotions")]
 
         [HttpPost]
 
         public IActionResult PromoteStudent(PromoteStudents request)
         {
-            using (var con = new SqlConnection("Data Source=db-mssql; Initial Catalog=s7973; Integrated Security=True"))
+            using (var con = new SqlConnection("Data Source=db-mssql; Initial Catalog=s7973; Integrated Security=True; MultipleActiveResultSets=True" ))
             using (var com = new SqlCommand())
-            using (var proc = new SqlCommand("procedura"))
+            using (var proc = new SqlCommand("PromoteStudents"))
             {
                 com.Connection = con;
+                com.CommandText = "select * from enrollment e, studies s where e.idstudy = s.idstudy and name = @name and semester = @semester";
                 proc.Connection = con;
                 con.Open();
 
-                try
-                {
-                    com.CommandText = "select * from enrollment e, studies s where e.idstudy = s.idstudy and name = @name and semester = @semester";
                     com.Parameters.AddWithValue("name", request.Studies);
                     com.Parameters.AddWithValue("semester", request.Semester);
                     var dr = com.ExecuteReader();
 
-                    if (!dr.Read())
+                    while (!dr.Read())
                     {
                         return BadRequest("404 Not Found");
                     }
-                    proc.CommandType = System.Data.CommandType.StoredProcedure;
-                    proc.Parameters.Add(new SqlParameter("@STUDY", request.Studies));
+                
+                proc.Connection = con;
+            
+                proc.CommandType = System.Data.CommandType.StoredProcedure;
+                    proc.Parameters.Add(new SqlParameter("@STUDIES", request.Studies));
                     proc.Parameters.Add(new SqlParameter("@SEMESTER", request.Semester));
 
+                proc.ExecuteReader();
 
-                }
-                catch (SqlException e)
+                var output = new Enrollment();
+                con.Close();
+                con.Open();
+                com.CommandText = "select * from enrollment where StartDate = (select max(StartDate) from enrollment)";
+
+                dr = com.ExecuteReader();
+
+                while (dr.Read())
                 {
-                   
-                }
+                    output = new Enrollment
+                    {
+                        IdEnrollment = int.Parse(dr["IdEnrollment"].ToString()),
+                        Semester = int.Parse(dr["Semester"].ToString()),
+                        IdStudy = int.Parse(dr["IdStudy"].ToString()),
+                        StartDate = DateTime.Parse(dr["StartDate"].ToString())
+                    }; ;
 
-                return Ok();
+
+                }
+                return StatusCode(201, output);
+
+
             }
         }
 

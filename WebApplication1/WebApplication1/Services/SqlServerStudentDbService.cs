@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models;
 using WebApplication1.DAL;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication1.Services
 {
@@ -15,11 +16,9 @@ namespace WebApplication1.Services
 
         public Student GetStudent(String index)
         {
-            
+
             var output = new Student();
-            using (var con = new SqlConnection("Data Source=db-mssql; Initial Catalog=s7973; Integrated Security=True"))
-            using (var com = new SqlCommand())
-              
+            
             using (var client = new SqlConnection(SqlConn))
             {
 
@@ -30,21 +29,20 @@ namespace WebApplication1.Services
 
                     client.Open();
                     var dr = command.ExecuteReader();
-
                     while (dr.Read())
                     {
                         output = (new Student
                         {
-                            id = dr["IndexNumber"].ToString()
-                        }); ;
-
+                            IndexNumber = dr["IndexNumber"].ToString()
+                            
+                    });;
 
                     }
                 }
             }
             return output;
+            ;
         }
 
-        
     }
 }

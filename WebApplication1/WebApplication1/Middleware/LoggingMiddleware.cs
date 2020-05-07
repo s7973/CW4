@@ -23,20 +23,20 @@ namespace WebApplication1.Middleware
             context.Request.EnableBuffering();
             if (context.Request != null)
             {
-                string path = context.Request.Path; //api/students
-                string method = context.Request.Method; //GET, POST
-                string queryString = context.Request.QueryString.ToString(); //zapytanie sql
+                string path = context.Request.Path; 
+                string method = context.Request.Method; 
+                string queryString = context.Request.QueryString.ToString(); 
                 string bodyStr = "";
 
                 using (var reader = new StreamReader(context.Request.Body, Encoding.UTF8, true, 1024, true))
                 {
                     bodyStr = await reader.ReadToEndAsync();
-                    context.Request.Body.Position = 0;
+                    context.Request.Body.Seek(0, SeekOrigin.Begin);
                 }
                 string[] lines = {path, method, queryString, bodyStr };
-                System.IO.File.WriteAllLines(@"C:\Users\fongo\Desktop\CW4\WebApplication1\WriteLines.txt", lines);
+                System.IO.File.WriteAllLines(@"C:\Users\fongo\Desktop\CW4\WebApplication1\requestsLog.txt", lines);
 
-                //zapisac do pliku
+               
             }
 
             await _next(context);
