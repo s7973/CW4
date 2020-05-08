@@ -1,4 +1,10 @@
 /api/enrollments
 POST
 
-
+{
+"IndexNumber": "s1236",
+"FirstName": "Andrzej",
+"LastName": "Malewski",
+"BirthDate": "1993-03-30",
+"Studies": "Informatyka"
+}

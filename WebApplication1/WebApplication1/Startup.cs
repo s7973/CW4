@@ -44,7 +44,7 @@ namespace WebApplication1
             app.UseHttpsRedirection();
             
             app.UseMiddleware<LoggingMiddleware>();
-            
+            /*
             app.Use(async (contex, next) =>
             {
                 if (!contex.Request.Headers.ContainsKey("Index"))
@@ -68,7 +68,7 @@ namespace WebApplication1
 
                 await next();
             });
-            
+            */
 
             app.UseRouting();
 
