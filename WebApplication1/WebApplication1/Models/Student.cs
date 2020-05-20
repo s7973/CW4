@@ -18,8 +18,9 @@ namespace WebApplication1.Models
 
         public int IdEnrollment { get; set; }
 
-        public String Index { get; set; }
-        public String id { get; set; }
+        public String Password { get; set; }
+
+        public String refToken { get; set; }
 
     }
 
@@ -31,6 +32,12 @@ namespace WebApplication1.Models
         
     }
     
+    public class StudentLogin
+    {
+        public String IndexNumber { get; set; }
+
+        public String refToken { get; set; }
+    }
     
 
 }

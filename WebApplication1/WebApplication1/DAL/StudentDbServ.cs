@@ -7,7 +7,7 @@ using WebApplication1.Models;
 
 namespace WebApplication1.DAL
 {
-    public class StudentDbService : IStudentDbService
+    public class StudentDbServ : IStudentDbServ
     {
         private String SqlConn = "Data Source=db-mssql; Initial Catalog=s7973; Integrated Security=True";
         public IEnumerable<Student> GetStudents()

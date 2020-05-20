@@ -6,8 +6,9 @@ using WebApplication1.Models;
 
 namespace WebApplication1.DAL
 {
-    public interface IStudentDbService
+    public interface IStudentDbServ
     {
+
         IEnumerable<Student> GetStudents();
         IEnumerable<Student2> GetStudentById(String id);
 
