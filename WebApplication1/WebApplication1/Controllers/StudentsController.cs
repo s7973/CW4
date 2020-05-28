@@ -44,7 +44,7 @@ namespace WebApplication1.Controllers
         }
         
         [HttpGet("{id}")]
-
+        
         public IActionResult GetStudentsById([FromRoute] String id)
         {
             return Ok(_studentDbServ.GetStudentById(id));

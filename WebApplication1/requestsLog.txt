@@ -1,4 +1,4 @@
-/api/students/refresh-token/16bfd96e-1f9d-459f-8cbc-c45e9100aa66
-POST
+/api/enrollments
+GET
 
 
