@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using WebApplication1.DAL;
+using WebApplication1.EFControllers;
 using WebApplication1.Handlers;
 using WebApplication1.Middleware;
 using WebApplication1.Services;
@@ -56,8 +57,9 @@ namespace WebApplication1
 
             services.AddScoped<IStudentDbService, SqlServerStudentDbService>();
             services.AddScoped<IStudentDbServ, StudentDbServ>();
+            services.AddScoped<EFStudentsController>();
 
-            
+
 
             services.AddControllers()
                     .AddXmlSerializerFormatters();
